@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BrandHero — Where Science Meets Design</title>
+<meta name="description" content="Science-backed, data-driven design studio for venture-funded startups. Global, remote, and YC-backed."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Hard Scroll Reset & Theme Logic -->
+<script>
+  // Hard Reset Scroll immediately on run
+  if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+  window.scrollTo(0, 0);
+
+  window.onbeforeunload = function () { window.scrollTo(0, 0); };
+
+  // Theme Toggle Logic
+  function toggleTheme() {
+    const htmlObj = document.documentElement;
+    const iconObj = document.getElementById('theme-icon');
+    
+    htmlObj.classList.toggle('light-mode-active');
+    
+    // Fallback for CSS colors that don't invert well
+    if (htmlObj.classList.contains('light-mode-active')) {
+      // Moon Icon
+      iconObj.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      localStorage.setItem('theme', 'light');
+    } else {
+      // Sun Icon
+      iconObj.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  // Ensure scroll is at top on load
+  window.addEventListener('load', () => { window.scrollTo(0, 0); });
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { background-color: #09090B; color: #FAFAFA; font-family: 'Inter', sans-serif; overflow-x: hidden; margin: 0; }
+  
+  /* Light Mode Core Injection */
+  html.light-mode-active { filter: invert(0.95) hue-rotate(180deg); background: #f0f0f0; color-scheme: light; }
+  html.light-mode-active #preloader,
+  html.light-mode-active canvas, 
+  html.light-mode-active img, 
+  html.light-mode-active .live-dot,
+  html.light-mode-active .background-blur-fix { filter: invert(1) hue-rotate(180deg); }
+  
+  body.no-scroll { overflow: hidden; height: 100vh; }
+
+  /* ══════════════════════════════════════════════
+     ULTRA-PREMIUM PRELOADER
+  ══════════════════════════════════════════════ */
+  #preloader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: radial-gradient(ellipse at 50% 50%, #0a0a14 0%, #09090B 60%);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    transition: opacity 1.2s cubic-bezier(0.7,0,0.3,1);
+  }
+
+  /* Canvas Particle Globe */
+  #globe-canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+  }
+
+  /* Scan Lines Overlay */
+  #preloader::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 243, 255, 0.012) 3px,
+      rgba(0, 243, 255, 0.012) 4px
+    );
+    pointer-events: none; z-index: 5;
+    animation: scanMove 8s linear infinite;
+  }
+  @keyframes scanMove { 0% { background-position: 0 0; } 100% { background-position: 0 100vh; } }
+
+  /* HUD Corner Indicators */
+  .hud-corner {
+    position: absolute; width: 40px; height: 40px;
+    border-color: rgba(0, 243, 255, 0.5); border-style: solid;
+    z-index: 10;
+  }
+  .hud-corner.tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+  .hud-corner.tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+  .hud-corner.bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+  .hud-corner.br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+  /* Status Bar */
+  .hud-status {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+    font-family: 'Space Grotesk', monospace; font-size: 9px; letter-spacing: 0.3em;
+    color: rgba(0, 243, 255, 0.5); text-transform: uppercase; z-index: 10;
+    animation: statusBlink 1.5s steps(1) infinite;
+  }
+  @keyframes statusBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Coordinates Display */
+  .hud-coords {
+    position: absolute; top: 24px; right: 28px;
+    font-family: 'Space Grotesk', monospace; font-size: 8px; letter-spacing: 0.15em;
+    color: rgba(0, 243, 255, 0.35); text-transform: uppercase; z-index: 10; text-align: right;
+    line-height: 1.8;
+  }
+
+  /* THE BRAND NAME — Ultra-Premium Reveal */
+  #splash-logo {
+    position: relative; z-index: 20;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(48px, 10vw, 140px); letter-spacing: -0.04em;
+    color: transparent;
+    background: linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.6) 40%, #00F3FF 60%, #FF2E5B 100%);
+    -webkit-background-clip: text; background-clip: text;
+    background-size: 300% 300%;
+    animation: logoReveal 5.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform-style: preserve-3d;
+    will-change: transform, opacity, filter;
+  }
+
+  @keyframes logoReveal {
+    0% {
+      transform: perspective(1200px) scale(0.25) rotateX(80deg) rotateY(-30deg) translateZ(-600px);
+      opacity: 0; filter: blur(30px) brightness(3);
+      letter-spacing: 0.5em;
+      background-position: 0% 50%;
+    }
+    20% {
+      transform: perspective(1200px) scale(1.05) rotateX(-8deg) rotateY(6deg) translateZ(80px);
+      opacity: 1; filter: blur(0px) brightness(1.5);
+      letter-spacing: -0.05em;
+      background-position: 50% 50%;
+    }
+    60% {
+      transform: perspective(1200px) scale(1) rotateX(0deg) rotateY(0deg) translateZ(0px);
+      opacity: 1; filter: drop-shadow(0 0 50px rgba(0, 243, 255, 0.6)) drop-shadow(0 0 100px rgba(0, 243, 255, 0.2));
+      background-position: 100% 50%;
+    }
+    85% {
+      transform: perspective(1200px) scale(1) rotateX(0deg) rotateY(0deg) translateZ(0px);
+      opacity: 1; filter: drop-shadow(0 0 60px rgba(0, 243, 255, 0.8));
+    }
+    100% {
+      transform: perspective(1200px) scale(6) rotateX(0deg) translateZ(1800px);
+      opacity: 0; filter: blur(60px) brightness(2);
+      background-position: 150% 50%;
+    }
+  }
+
+  /* Tagline Under Logo */
+  #splash-tagline {
+    position: relative; z-index: 20;
+    font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 0.4em;
+    color: rgba(0, 243, 255, 0.6); text-transform: uppercase;
+    margin-top: 20px;
+    animation: taglineReveal 5.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  @keyframes taglineReveal {
+    0%, 15% { opacity: 0; transform: translateY(20px); }
+    30% { opacity: 1; transform: translateY(0); }
+    75% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Chromatic aberration glitch overlays */
+  .logo-ghost {
+    position: absolute; inset: 0; z-index: -1;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(48px, 10vw, 140px); letter-spacing: -0.04em;
+    pointer-events: none; white-space: nowrap;
+  }
+  .logo-ghost.cyan-ghost {
+    color: #00F3FF; opacity: 0.25; transform: translateX(4px) translateY(-2px);
+    animation: ghostPulse 0.15s steps(1) infinite, taglineReveal 5.5s forwards;
+  }
+  .logo-ghost.rose-ghost {
+    color: #FF2E5B; opacity: 0.2; transform: translateX(-4px) translateY(2px);
+    animation: ghostPulse2 0.2s steps(1) infinite, taglineReveal 5.5s forwards;
+  }
+  @keyframes ghostPulse { 0% { opacity: 0.25; } 50% { opacity: 0.1; } }
+  @keyframes ghostPulse2 { 0% { opacity: 0.2; } 70% { opacity: 0.08; } }
+
+  /* ══════════════════════════════════════════════
+     MAIN PAGE STYLES
+  ══════════════════════════════════════════════ */
+  .technical-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 243, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 243, 255, 0.04) 1px, transparent 1px);
+    background-size: 70px 70px;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 65%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 65%);
+    z-index: 0; pointer-events: none;
+    transform: perspective(800px) rotateX(40deg) translateY(-20%);
+    animation: gridDrift 25s linear infinite;
+  }
+  @keyframes gridDrift { 0% { background-position: 0 0; } 100% { background-position: 0 700px; } }
+
+  /* Noise Texture Overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+  }
+
+  .glass {
+    background: rgba(255,255,255,0.025);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .glass-cyan { border-color: rgba(0, 243, 255, 0.15); background: rgba(0, 243, 255, 0.04); }
+  .glass-rose { border-color: rgba(255, 46, 91, 0.15); background: rgba(255, 46, 91, 0.04); }
+  .glass-hover:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.14);
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,243,255,0.05);
+  }
+
+  /* Spotlight Effect */
+  #spotlight {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle 500px at var(--mouse-x) var(--mouse-y), rgba(0, 243, 255, 0.06), transparent 80%);
+    mix-blend-mode: plus-lighter;
+  }
+
+  /* ══════════════════════════════════════════════
+     DYNAMIC BOX INTERACTIONS
+  ══════════════════════════════════════════════ */
+  .tilt-card {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
+    --beam-size: 150px;
+  }
+
+  /* Card Cursor Glow & Sheen */
+  .tilt-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 10;
+    background: 
+      radial-gradient(circle 200px at var(--card-x) var(--card-y), rgba(255, 255, 255, 0.08), transparent 80%),
+      linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+    background-size: 100% 100%, 200% 100%;
+    background-position: 0 0, 150% 0;
+    opacity: 0; transition: opacity 0.4s ease, background-position 0.6s ease; pointer-events: none;
+  }
+  .tilt-card:hover::before { opacity: 1; background-position: 0 0, -50% 0; }
+
+  /* BORDER BEAM EFFECT */
+  .border-beam::after {
+    content: ''; position: absolute; inset: -1px;
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0%, var(--hover-color, #00F3FF) 15%, transparent 30%);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude; -webkit-mask-composite: xor;
+    padding: 1px; opacity: 0; transition: opacity 0.4s ease;
+    animation: beamRotate 4s linear infinite; pointer-events: none;
+  }
+  .tilt-card:hover.border-beam::after { opacity: 1; }
+  @keyframes beamRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* Section Zoom Effects */
+  .reveal { 
+    opacity: 0; 
+    transform: translateY(100px) scale(0.75); 
+    filter: blur(20px);
+    transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                opacity 1.2s ease, 
+                filter 1.2s ease; 
+    will-change: transform, opacity, filter;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+  
+  /* Reverse Scroll Scale (Zoom Out) */
+  .reveal.scrolling-out { transform: scale(0.8) translateY(-80px); opacity: 0; filter: blur(15px); }
+
+  /* Smooth Floating Animation */
+  @keyframes floatUI {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  .float-anim { animation: floatUI 6s ease-in-out infinite; }
+
+  /* Surroundings Glow */
+  .glass-hover:hover {
+    border-color: var(--hover-color, rgba(0, 243, 255, 0.3)) !important;
+    box-shadow: 
+      0 0 50px rgba(0, 0, 0, 0.6),
+      0 0 40px var(--glow-color, rgba(0, 243, 255, 0.15));
+  }
+
+  /* Globe Rotation Animations */
+  @keyframes globeRotate {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-globe-rotate {
+    animation: globeRotate 30s linear infinite;
+  }
+  .animate-globe-rotate-fast {
+    animation: globeRotate 20s linear infinite reverse;
+  }
+
+  /* Gradient Text  */
+  .text-grad-cyan {
+    background: linear-gradient(135deg, #00F3FF, #7B61FF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-grad-rose {
+    background: linear-gradient(135deg, #FF6B35, #FF2E5B);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-grad-all {
+    background: linear-gradient(135deg, #00F3FF, #FF2E5B, #FF6B35);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(40px) scale(0.96); transition: all 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  /* Progress Bars */
+  .progress-fill { transition: width 2.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+  /* Industry Tab */
+  .industry-tab { transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .industry-tab.active { background: rgba(0,243,255,0.1); color: #00F3FF; border-color: rgba(0,243,255,0.4); box-shadow: 0 0 30px rgba(0,243,255,0.15), inset 0 0 20px rgba(0,243,255,0.05); }
+
+  /* Animated Counter */
+  @keyframes countUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Floating CTA Dot */
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 0 rgba(16,185,129,0.5); animation: livePulse 2s infinite; }
+  @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* Beautiful 3D CSS Globe (Bento Footer) */
+  @keyframes slideGlobeText { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .pulse-red { animation: pulseRed 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  @keyframes pulseRed { 0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px #FF2E5B; } 50% { opacity: .5; transform: scale(0.8); box-shadow: 0 0 5px #FF2E5B; } }
+
+  /* Logo Marquee Ticker */
+  @keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  @keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+  
+  .animate-marquee { display: flex; width: max-content; animation: marqueeLeft 45s linear infinite; }
+  .animate-marquee-reverse { display: flex; width: max-content; animation: marqueeRight 50s linear infinite; }
+  
+  .logo-item {
+    font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700;
+    color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 8px; padding: 0 40px;
+  }
+
+  /* Global Card Zoom & Glow Enhancements */
+  .tilt-card { transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease; }
+  .tilt-card:hover { transform: scale(1.02) translateY(-5px); }
+  
+  .nav-link { transition: all 0.3s ease; display: inline-block; transform-origin: center; }
+  .nav-link:hover { transform: scale(1.2); color: #FFF; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+
+  #header-nav { transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+</style>
+</head>
+<body class="no-scroll relative">
+
+<!-- Global Spotlight Overlay -->
+<div id="spotlight"></div>
+
+<!-- ══════════════════════════════════════
+  ULTRA PRELOADER — Canvas Globe + 3D Logo
+══════════════════════════════════════ -->
+<div id="preloader">
+  <!-- Canvas Particle Globe -->
+  <canvas id="globe-canvas"></canvas>
+
+  <!-- HUD Corners -->
+  <div class="hud-corner tl"></div>
+  <div class="hud-corner tr"></div>
+  <div class="hud-corner bl"></div>
+  <div class="hud-corner br"></div>
+
+  <!-- HUD Coordinates -->
+  <div class="hud-coords">
+    <div>LAT 12.9716° N</div>
+    <div>LON 77.5946° E</div>
+    <div style="margin-top:4px; color: rgba(255,46,91,0.4);">■ GLOBAL NETWORK ACTIVE</div>
+  </div>
+
+  <!-- HUD Status Bar -->
+  <div class="hud-status">⬡ BRANDHERO STUDIO PROTOCOL — INITIALIZING CANVAS ▊</div>
+
+  <!-- Logo + Chromatic Ghosts -->
+  <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+    <div class="logo-ghost cyan-ghost" aria-hidden="true">BRANDHERO</div>
+    <div class="logo-ghost rose-ghost" aria-hidden="true">BRANDHERO</div>
+    <div id="splash-logo">BRANDHERO</div>
+    <div id="splash-tagline">Science · Technology · Conversion</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+  AMBIENT BACKGROUND (Main Page)
+══════════════════════════════════════ -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
+  <div class="technical-grid"></div>
+  <!-- Radial Glows -->
+  <div class="absolute top-[-20%] left-[-10%] w-[700px] h-[700px] rounded-full"
+    style="background: radial-gradient(circle, rgba(0,243,255,0.07) 0%, transparent 70%); animation: pulse 8s ease-in-out infinite;"></div>
+  <div class="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full"
+    style="background: radial-gradient(circle, rgba(255,46,91,0.06) 0%, transparent 70%); animation: pulse 10s ease-in-out infinite; animation-delay: 2s;"></div>
+  <div class="absolute top-[40%] right-[20%] w-[400px] h-[400px] rounded-full"
+    style="background: radial-gradient(circle, rgba(123,97,255,0.05) 0%, transparent 70%); animation: pulse 12s ease-in-out infinite; animation-delay: 4s;"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+  NAVIGATION — FLOATING ISLAND
+══════════════════════════════════════ -->
+<style>
+  #header-nav { transition: top 0.4s ease, opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+  .nav-link { position: relative; padding-bottom: 2px; display: inline-block; }
+  .nav-link::after {
+    content: ''; position: absolute; bottom: -2px; left: 0;
+    width: 0; height: 1px;
+    background: linear-gradient(90deg, #00F3FF, #7B61FF);
+    transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+  }
+  .nav-link:hover { color: #00F3FF; }
+  .nav-link:hover::after { width: 100%; }
+  .nav-cta {
+    position: relative; overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  .nav-cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+  .nav-cta:hover::before { transform: translateX(0); }
+  .nav-cta:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(0,243,255,0.5) !important;
+  }
+</style>
+<header id="header-nav"
+  class="fixed top-6 inset-x-0 z-50 flex justify-center transition-all duration-700 pointer-events-none"
+  style="transform: translateY(-120%); opacity: 0;">
+  
+  <nav class="flex items-center justify-between w-[95%] max-w-[1100px] px-8 py-3 rounded-[16px] pointer-events-auto"
+    style="background: rgba(18,18,20,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+
+    <!-- Logo -->
+    <a href="#" class="font-space font-black tracking-tighter" style="font-size:26px; text-decoration:none; transform: scaleX(0.95); transform-origin: left; display: inline-block;">
+      <span class="text-grad-cyan">BRAND</span><span style="letter-spacing:-1px; color:#FAFAFA;">HERO</span>
+    </a>
+
+    <!-- Nav Links (Center) -->
+    <ul class="hidden lg:flex items-center gap-8 font-inter" style="list-style:none; margin:0; padding:0;">
+      <li><a href="#work" class="nav-link text-white font-medium transition-colors hover:text-white/70" style="font-size:14px; text-decoration:none;">Work</a></li>
+      <li><a href="#services" class="nav-link text-white font-medium transition-colors hover:text-white/70" style="font-size:14px; text-decoration:none;">Services</a></li>
+      <li><a href="#partners" class="nav-link text-white font-medium transition-colors hover:text-white/70" style="font-size:14px; text-decoration:none;">Clients</a></li>
+      <li><a href="#transformation" class="nav-link text-white font-medium transition-colors hover:text-white/70" style="font-size:14px; text-decoration:none;">Case Studies</a></li>
+      <li><a href="#resources" class="nav-link text-white font-medium transition-colors hover:text-white/70 flex items-center gap-1" style="font-size:14px; text-decoration:none;">Resources <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a></li>
+      <li><a href="#contact" class="nav-link text-white font-medium transition-colors hover:text-white/70" style="font-size:14px; text-decoration:none;">Contact</a></li>
+    </ul>
+
+    <!-- Right Side: Sun icon & CTA -->
+    <div class="flex items-center gap-6">
+      <!-- Theme Toggle Button -->
+      <button onclick="toggleTheme()" class="text-white hover:text-gray-400 transition-colors" aria-label="Toggle Theme">
+        <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Sun SVG -->
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+
+      <!-- CTA -->
+      <a href="#contact" onclick="alert('Strategy call booking opens soon!');"
+        class="flex items-center gap-3 text-white font-bold transition-all hover:bg-white/5 active:scale-95"
+        style="font-size:13px; font-family:'Inter', sans-serif; padding:10px 16px; border-radius:8px; border: 1px solid rgba(255,255,255,0.08); text-decoration:none; background:rgba(0,0,0,0.5);">
+        <span style="width:10px; height:10px; background:#4ade80; border-radius:50%; display:inline-block; box-shadow: 0 0 8px rgba(74,222,128,0.6); animation: livePulse 2s infinite;"></span>
+        Book a 15-min Call
+      </a>
+    </div>
+
+  </nav>
+</header>
+
+<!-- ══════════════════════════════════════
+  HERO SECTION
+══════════════════════════════════════ -->
+<section id="hero" class="relative z-10 min-h-screen flex items-center px-6 md:px-16 pt-40 pb-20">
+  <div class="max-w-[1400px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+    <!-- Left: Copy -->
+    <div class="reveal">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-3 mb-10" style="padding: 8px 18px; border-radius: 999px; background: rgba(0,243,255,0.04); border: 1px solid rgba(0,243,255,0.2); box-shadow: inset 0 0 20px rgba(0,243,255,0.04), 0 0 30px rgba(0,243,255,0.06);">
+        <span style="width:8px; height:8px; border-radius:50%; background:#00F3FF; display:inline-block; box-shadow: 0 0 12px #00F3FF; animation: livePulse 2s infinite;"></span>
+        <span style="font-size:10px; font-weight:800; letter-spacing:0.28em; color:#00F3FF; text-transform:uppercase; font-family:'Space Grotesk',sans-serif;">Science-Backed Design Studio</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-space font-bold leading-[0.95] tracking-tight mb-8"
+        style="font-size: clamp(52px, 7vw, 92px);">
+        <span class="block text-white">We help startups</span>
+        <span class="block text-grad-cyan" style="font-size: 0.95em;">Convert 20% more.</span>
+        <span class="block text-white">Raise next rounds.</span>
+        <span class="block italic font-light" style="color: rgba(250,250,250,0.3); font-size: 0.75em;">Since 2016.</span>
+      </h1>
+
+      <div class="glow-line-h mb-8" style="width: 200px;"></div>
+
+      <p class="text-lg font-light leading-relaxed mb-10 max-w-lg" style="color: rgba(250,250,250,0.55);">
+        The conversion design partner for category-defining startups. We reduce sales effort costs by <span style="color: #00F3FF; font-weight: 700;">40%</span> via science-backed UI/UX.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-5">
+        <a href="#usp"
+          class="px-9 py-4 rounded-xl font-bold text-black transition-all hover:scale-110 active:scale-95 duration-300"
+          style="background: linear-gradient(135deg, #00F3FF, #7B61FF); box-shadow: 0 12px 40px rgba(0,243,255,0.3); font-size: 15px;">
+          See the Impact →
+        </a>
+        <a href="#services"
+          class="px-9 py-4 rounded-xl font-semibold glass glass-hover transition-all hover:scale-110 active:scale-95 duration-300"
+          style="font-size: 15px; color: rgba(250,250,250,0.7);">
+          Our Services
+        </a>
+      </div>
+
+      <!-- Social Proof Strip -->
+      <div class="flex items-center gap-6 mt-12 pt-8" style="border-top: 1px solid rgba(255,255,255,0.06);">
+        <div class="text-center">
+          <div class="font-space font-black text-2xl text-grad-cyan">9+</div>
+          <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase;">Yrs</div>
+        </div>
+        <div class="glow-line-v" style="height:36px;"></div>
+        <div class="text-center">
+          <div class="font-space font-black text-2xl text-white">200+</div>
+          <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase;">Happy Clients</div>
+        </div>
+        <div class="glow-line-v" style="height:36px;"></div>
+        <div class="text-center">
+          <div class="font-space font-black text-2xl text-grad-rose">95%</div>
+          <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase;">Return Rate</div>
+        </div>
+        <div class="glow-line-v" style="height:36px;"></div>
+        <div class="text-center">
+          <div class="font-space font-black text-2xl text-white">YC</div>
+          <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase;">Backed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Data Lab UI -->
+    <div class="reveal delay-200 float-anim">
+      <div id="data-lab-widget" class="glass tilt-card rounded-3xl overflow-hidden transition-all duration-700 hover:scale-[1.03]" style="border: 1px solid rgba(255,255,255,0.07); box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 80px rgba(0,243,255,0.03); --hover-color: #00F3FF; --glow-color: rgba(0, 243, 255, 0.1); position: relative; z-index: 50;">
+        <!-- Window Chrome -->
+        <div class="flex items-center justify-between px-6 py-4" style="background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <div class="flex gap-2">
+            <div class="w-3 h-3 rounded-full" style="background:#FF5F56;"></div>
+            <div class="w-3 h-3 rounded-full" style="background:#FEBC2E;"></div>
+            <div class="w-3 h-3 rounded-full" style="background:#27C840;"></div>
+          </div>
+          <div style="font-size:10px; letter-spacing:0.2em; color:rgba(255,255,255,0.25); font-family:'Space Grotesk'; text-transform:uppercase;">BrandHero · Data Lab v5</div>
+          <div class="flex items-center gap-2" style="font-size:10px; font-weight:700; letter-spacing:0.15em; color:#00F3FF; font-family:'Space Grotesk';">
+            <span class="live-dot" style="background:#00F3FF; animation: livePulse 2s infinite;"></span> LIVE
+          </div>
+        </div>
+        <div class="p-8">
+          <!-- Metrics -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="rounded-2xl p-5" style="background:rgba(0,243,255,0.06); border:1px solid rgba(0,243,255,0.12);">
+              <div style="font-size:9px; letter-spacing:0.2em; color:rgba(0,243,255,0.6); text-transform:uppercase; margin-bottom:6px;">Conversion</div>
+              <div class="font-space font-black text-grad-cyan" style="font-size:32px;">+284%</div>
+            </div>
+            <div class="rounded-2xl p-5" style="background:rgba(255,46,91,0.06); border:1px solid rgba(255,46,91,0.12);">
+              <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,46,91,0.6); text-transform:uppercase; margin-bottom:6px;">Churn Drop</div>
+              <div class="font-space font-black text-grad-rose" style="font-size:32px;">−62%</div>
+            </div>
+          </div>
+
+          <!-- Progress Bars -->
+          <div style="font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase; margin-bottom:16px;">30-Day Performance Index</div>
+          <div class="space-y-5">
+            <div>
+              <div class="flex justify-between mb-2">
+                <span style="font-size:12px; color:rgba(255,255,255,0.6);">User Retention</span>
+                <span class="font-space font-bold text-brand-cyan" style="font-size:12px;">87%</span>
+              </div>
+              <div class="rounded-full overflow-hidden" style="height:6px; background:rgba(255,255,255,0.05);">
+                <div class="progress-fill rounded-full" style="height:100%; width:0; background:linear-gradient(90deg, #00F3FF, #7B61FF); box-shadow: 0 0 12px rgba(0,243,255,0.5);" data-w="87"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-2">
+                <span style="font-size:12px; color:rgba(255,255,255,0.6);">Sales Velocity</span>
+                <span class="font-space font-bold text-brand-rose" style="font-size:12px;">+63%</span>
+              </div>
+              <div class="rounded-full overflow-hidden" style="height:6px; background:rgba(255,255,255,0.05);">
+                <div class="progress-fill rounded-full" style="height:100%; width:0; background:linear-gradient(90deg, #FF6B35, #FF2E5B); box-shadow: 0 0 12px rgba(255,46,91,0.5);" data-w="63"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sprint Info -->
+          <div class="grid grid-cols-2 gap-4 mt-8 pt-6" style="border-top: 1px solid rgba(255,255,255,0.05);">
+            <div>
+              <div style="font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:8px;">Current Sprint</div>
+              <div class="flex items-center gap-3">
+                <div class="rounded-xl glass flex items-center justify-center" style="width:40px;height:40px;">⚡</div>
+                <div style="font-size:12px; font-weight:600;">Framer Deploy</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; margin-bottom:8px;">Industry Focus</div>
+              <div class="flex items-center gap-3">
+                <div class="rounded-xl glass flex items-center justify-center" style="width:40px;height:40px;">💰</div>
+                <div style="font-size:12px; font-weight:600;">Fintech UI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+ 
+<!-- ══════════════════════════════════════
+  DISCOVER OUR WORK (Portfolio Mosaic)
+══════════════════════════════════════ -->
+<section id="work" class="py-24 overflow-hidden relative" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto text-center mb-16 px-6 reveal">
+    <div style="font-size:11px; font-weight:800; letter-spacing:0.25em; color:#FF2E5B; text-transform:uppercase; margin-bottom:16px;">
+      Works
+    </div>
+    <h2 class="font-space font-bold leading-tight mb-6 text-white" style="font-size: clamp(32px, 4.5vw, 56px);">
+      Discover Our Work
+    </h2>
+    <p style="font-size:16px; color:rgba(250,250,250,0.5); line-height:1.6; max-width: 600px; margin: 0 auto;">
+      Explore our curated showcase of UI/UX designs, mesmerizing websites, and captivating brand identities.
+    </p>
+  </div>
+
+  <!-- Portfolio Mosaic Grid -->
+  <div class="relative w-full flex flex-col gap-4 select-none pointer-events-none reveal delay-200">
+    <!-- Row 1 -->
+    <div class="flex gap-4 w-[150%] -translate-x-10">
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1581291518852-4e30ca1480f5?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+    </div>
+    
+    <!-- Row 2 -->
+    <div class="flex gap-4 w-[150%] -translate-x-[20%]">
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+      <div class="flex-1 aspect-[16/10] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl transition-transform hover:scale-95 pointer-events-auto cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1517292987719-0369a794ec0f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[0.3] hover:grayscale-0 transition-all duration-700">
+      </div>
+    </div>
+
+    <!-- Centered Button Overlay -->
+    <div class="absolute inset-0 flex items-center justify-center z-10">
+      <a href="/works" class="px-8 py-3 rounded-xl bg-white text-black font-bold text-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-3 transition-all hover:scale-110 active:scale-95 pointer-events-auto" style="text-decoration:none;">
+        Go To Works <span style="font-size:18px;">&rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  THE BRANDHERO EFFECT (BEFORE/AFTER)
+══════════════════════════════════════ -->
+<section id="transformation" class="py-32 px-6 md:px-16" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="text-center mb-16 reveal">
+      <h2 class="font-space font-bold leading-none tracking-tight mb-4 text-white" style="font-size: clamp(36px, 5vw, 64px);">
+        The BrandHero <span class="text-grad-cyan italic">Transformation.</span>
+      </h2>
+      <p style="font-size:16px; color:rgba(250,250,250,0.4); max-width:600px; margin:0 auto;">
+        From scattered brand identities to cohesive high-conversion experiences.
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 reveal">
+      <!-- Before -->
+      <div class="glass rounded-[40px] p-12 border-white/5 relative overflow-hidden group tilt-card border-beam transition-all duration-700 hover:scale-[1.03]" style="--hover-color: rgba(255, 255, 255, 0.2); --glow-color: rgba(255, 255, 255, 0.1);">
+        <div class="absolute top-0 right-0 p-8 text-[10px] font-bold text-gray-600 uppercase tracking-widest z-20">Pain Points</div>
+        <h4 class="font-space text-2xl text-gray-500 mb-10 relative z-20">Before BRANDHERO</h4>
+        <ul class="space-y-6 relative z-20">
+          <li class="flex items-center gap-4 text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-red-500/30"></span> Separate design & development teams
+          </li>
+          <li class="flex items-center gap-4 text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-red-500/30"></span> Scattered brand across platforms
+          </li>
+          <li class="flex items-center gap-4 text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-red-500/30"></span> Confusing handoffs & iterations
+          </li>
+          <li class="flex items-center gap-4 text-gray-400">
+            <span class="w-2 h-2 rounded-full bg-red-500/30"></span> Generic, low-converting designs
+          </li>
+        </ul>
+      </div>
+      <!-- After -->
+      <div class="glass rounded-[40px] p-12 border-brand-cyan/20 relative overflow-hidden bg-brand-cyan/[0.03] tilt-card border-beam transition-all duration-700 hover:scale-[1.03]" style="--hover-color: #00F3FF; --glow-color: rgba(0, 243, 255, 0.3);">
+        <div class="absolute top-0 right-0 p-8 text-[10px] font-bold text-brand-cyan uppercase tracking-widest shine z-20">Impact Data</div>
+        <h4 class="font-space text-2xl text-white mb-10 relative z-20">After BRANDHERO</h4>
+        <ul class="space-y-6 relative z-20">
+          <li class="flex items-center gap-4 text-white">
+             <span class="w-2 h-2 rounded-full bg-brand-cyan shadow-[0_0_10px_#00F3FF]"></span> Seamless Figma & Webflow integration
+          </li>
+          <li class="flex items-center gap-4 text-white">
+             <span class="w-2 h-2 rounded-full bg-brand-cyan shadow-[0_0_10px_#00F3FF]"></span> Science-backed data-driven solutions
+          </li>
+          <li class="flex items-center gap-4 text-white">
+             <span class="w-2 h-2 rounded-full bg-brand-cyan shadow-[0_0_10px_#00F3FF]"></span> User-centric high conversion focus
+          </li>
+          <li class="flex items-center gap-4 text-white font-bold">
+             <span class="w-2 h-2 rounded-full bg-brand-cyan shadow-[0_0_10px_#00F3FF]"></span> 20-60% Increase in Conversions
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  OUR PROCESS (POINT 4)
+══════════════════════════════════════ -->
+<section id="process" class="py-32 px-6 md:px-16" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="text-center mb-24 reveal">
+      <h2 class="font-space font-bold leading-none tracking-tight mb-4 text-white" style="font-size: clamp(36px, 5vw, 64px);">
+        From Vision to <span class="text-grad-rose italic">Reality.</span>
+      </h2>
+      <p style="font-size:16px; color:rgba(250,250,250,0.4);">A precision workflow rooted in data and empathy.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 reveal delay-100">
+      
+      <!-- Card 1 -->
+      <div class="p-8 pb-12 rounded-[28px] relative overflow-hidden group tilt-card transition-all duration-700 hover:scale-110 border-beam" 
+           style="background: #131315; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: #00F3FF; --glow-color: rgba(0, 243, 255, 0.15);">
+        <!-- Subtle glow blob behind text -->
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-brand-cyan/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"></div>
+        
+        <div class="relative z-10">
+          <div class="font-space text-[56px] leading-[1] font-black mb-6 transition-colors duration-500 group-hover:text-brand-cyan/30" style="color: #2F2F35;">1</div>
+          <h5 class="font-space text-[18px] font-bold text-white mb-4 transition-transform duration-500 group-hover:translate-x-1">Discovery</h5>
+          <p class="text-[13px] leading-[1.7] text-gray-500">Understanding needs and end-user perspectives through data & market analysis.</p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="p-8 pb-12 rounded-[28px] relative overflow-hidden group tilt-card transition-all duration-700 hover:scale-110 border-beam" 
+           style="background: #131315; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: #7B61FF; --glow-color: rgba(123, 97, 255, 0.15);">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#7B61FF]/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"></div>
+        <div class="relative z-10">
+          <div class="font-space text-[56px] leading-[1] font-black mb-6 transition-colors duration-500 group-hover:text-[#7B61FF]/30" style="color: #2F2F35;">2</div>
+          <h5 class="font-space text-[18px] font-bold text-white mb-4 transition-transform duration-500 group-hover:translate-x-1">Define</h5>
+          <p class="text-[13px] leading-[1.7] text-gray-500">Establishing a solid foundation and conversion-focused strategy for the project.</p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="p-8 pb-12 rounded-[28px] relative overflow-hidden group tilt-card transition-all duration-700 hover:scale-110 border-beam" 
+           style="background: #131315; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: #FF6B35; --glow-color: rgba(255, 107, 53, 0.15);">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#FF6B35]/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"></div>
+        <div class="relative z-10">
+          <div class="font-space text-[56px] leading-[1] font-black mb-6 transition-colors duration-500 group-hover:text-[#FF6B35]/30" style="color: #2F2F35;">3</div>
+          <h5 class="font-space text-[18px] font-bold text-white mb-4 transition-transform duration-500 group-hover:translate-x-1">Design</h5>
+          <p class="text-[13px] leading-[1.7] text-gray-500">Crafting immersive websites and products using Figma, Webflow, and Framer.</p>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="p-8 pb-12 rounded-[28px] relative overflow-hidden group tilt-card transition-all duration-700 hover:scale-110 border-beam" 
+           style="background: #131315; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: #FF2E5B; --glow-color: rgba(255, 46, 91, 0.15);">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#FF2E5B]/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-0"></div>
+        <div class="relative z-10">
+          <div class="font-space text-[56px] leading-[1] font-black mb-6 transition-colors duration-500 group-hover:text-brand-rose/30" style="color: #2F2F35;">4</div>
+          <h5 class="font-space text-[18px] font-bold text-white mb-4 transition-transform duration-500 group-hover:translate-x-1">Iterate</h5>
+          <p class="text-[13px] leading-[1.7] text-gray-500">Continuous refinement based on real testing to ensure designs leave a lasting impact.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  TESTIMONIALS (REAL VOICES)
+══════════════════════════════════════ -->
+<section id="testimonials" class="py-32 px-6 md:px-16" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 reveal">
+      <div class="glass p-12 rounded-[40px] relative">
+        <div class="text-5xl text-brand-cyan mb-8 opacity-20">"</div>
+        <p class="text-xl text-white italic leading-relaxed mb-10">
+          Delightful experience working with Vin as he crafts Foundership’s new website. A fantastic professional.
+        </p>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-brand-cyan/20 flex items-center justify-center font-bold text-brand-cyan">SP</div>
+          <div>
+            <div class="font-bold text-white">Santosh Panda</div>
+            <div class="text-xs text-gray-500 uppercase tracking-widest">Founder, Foundership</div>
+          </div>
+        </div>
+      </div>
+      <div class="glass p-12 rounded-[40px] relative">
+        <div class="text-5xl text-brand-rose mb-8 opacity-20">"</div>
+        <p class="text-xl text-white italic leading-relaxed mb-10">
+          Vin and his team developed a great report for our waste to energy project. I strongly recommend his services!
+        </p>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-brand-rose/20 flex items-center justify-center font-bold text-brand-rose">RB</div>
+          <div>
+            <div class="font-bold text-white">Rutger de Bruijn</div>
+            <div class="text-xs text-gray-500 uppercase tracking-widest">Founder, NexusNovus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  ABOUT / FOUNDER (Highlights Bento Grid)
+══════════════════════════════════════ -->
+<section id="about" class="py-24 px-6 md:px-16" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 reveal">
+      
+      <!-- Left Column (Span 3) -->
+      <div class="col-span-1 md:col-span-3 flex flex-col gap-6">
+        
+        <!-- Clients Served Card -->
+        <div class="glass flex-1 rounded-3xl p-8 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-500 min-h-[300px]" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); --hover-color: rgba(255,255,255,0.2);">
+          <h3 class="font-inter font-bold text-white text-[19px] mb-2 relative z-10 leading-snug">Clients Served in 10+ Countries</h3>
+          <p class="text-[13px] text-gray-400 mb-8 relative z-10">We're remote and serve globally</p>
+          
+          <!-- Globe Visual (Ultra-High-Fidelity 3D Rotating Sphere) -->
+          <div class="absolute -bottom-[20%] -left-[10%] w-[120%] h-auto opacity-95 pointer-events-none">
+            <div class="w-full aspect-square rounded-full relative overflow-hidden group-hover:scale-105 transition-transform duration-1000" 
+                 style="background: #000; box-shadow: inset 0 0 60px rgba(0,0,0,1), 0 20px 50px rgba(0,0,0,0.6);">
+               
+               <!-- Rotating Map Layer -->
+               <div class="absolute inset-0 flex animate-globe-rotate" style="width: 200%; height: 100%;">
+                 <div class="w-1/2 h-full opacity-50" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1.2px); background-size: 14px 14px;"></div>
+                 <div class="w-1/2 h-full opacity-50" style="background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1.2px); background-size: 14px 14px;"></div>
+               </div>
+
+               <!-- Superior Spherical Lighting (The 'Perfect' Look) -->
+               <div class="absolute inset-0 rounded-full" 
+                    style="background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(0,0,0,0.9) 85%);">
+               </div>
+               <div class="absolute inset-0 rounded-full" 
+                    style="background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(0,0,0,0.4) 100%);">
+               </div>
+               
+               <!-- Internal Glow/Reflection -->
+               <div class="absolute inset-0 rounded-full border border-white/5 shadow-[inset_0_0_30px_rgba(255,255,255,0.02)]"></div>
+               
+               <!-- Active Pulse Nodes -->
+               <div class="absolute w-2 h-2 bg-brand-rose rounded-full top-[38%] left-[42%] shadow-[0_0_20px_#FF2E5B] animate-pulse"></div>
+               <div class="absolute w-1.5 h-1.5 bg-brand-rose rounded-full top-[55%] right-[28%] shadow-[0_0_12px_#FF2E5B] animate-pulse" style="animation-delay: 0.7s;"></div>
+               <div class="absolute w-1.5 h-1.5 bg-brand-cyan rounded-full bottom-[42%] left-[35%] shadow-[0_0_15px_#00F3FF] animate-pulse" style="animation-delay: 1.4s;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Experience Card -->
+        <div class="glass rounded-3xl p-8 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-500" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); --hover-color: #FF2E5B; --glow-color: rgba(255,46,91,0.1);">
+          <!-- Sparkle SVG Placeholder -->
+          <div class="mb-4 text-brand-rose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M12 16v6"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M2 12h6"/><path d="M16 12h6"/><path d="M4.93 19.07l4.24-4.24"/><path d="M14.83 9.17l4.24-4.24"/></svg></div>
+          <h3 class="font-inter font-bold text-white text-[19px] mb-2 leading-tight">9+ years in industry</h3>
+          <p class="text-[13px] text-gray-400">You're in experienced hands</p>
+        </div>
+
+      </div>
+
+      <!-- Center Column (Span 6) -->
+      <div class="col-span-1 md:col-span-6 flex flex-col">
+        <div class="glass flex-1 rounded-[40px] relative overflow-hidden group tilt-card border-beam hover:scale-[1.01] transition-all duration-700 min-h-[500px] flex flex-col justify-end" style="border: 1px solid rgba(255,255,255,0.04); --hover-color: #00F3FF; --glow-color: rgba(0,243,255,0.1); background: #000;">
+          
+          <!-- YouTube Video Embed (via JS API for guaranteed Autoplay) -->
+          <div class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+            <div id="yt-showcase-player" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] h-[115%]" style="aspect-ratio: 16/9;"></div>
+            <!-- Cinematic Vignette & Shadow Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+            <div class="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.6)]"></div>
+          </div>
+          
+          <!-- Bottom Overlay Bar (Always Visible but Blurred) -->
+          <div class="relative m-8 p-5 px-8 rounded-2xl flex flex-wrap items-center justify-between z-10" style="background: rgba(18,18,20,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+            <!-- Logo -->
+            <div class="font-space font-black tracking-tighter" style="font-size:24px; color:#FF2E5B; transform: scaleX(0.95); transform-origin: left;">BRAND<span style="letter-spacing:-1px;">HERO</span></div>
+            <!-- Buttons -->
+            <div class="flex items-center gap-4">
+              <a href="#work" class="px-6 py-3 rounded-xl text-white text-sm font-semibold transition-all hover:bg-white/10 hover:scale-105" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-decoration:none;">See Work ↗</a>
+              <a href="#contact" class="flex items-center gap-2 px-6 py-3 rounded-xl text-black text-sm font-bold bg-white transition-all hover:scale-105 active:scale-95" style="text-decoration:none;">Book Discovery Call <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="16" height="12" rx="2"></rect><polygon points="18 10 22 8 22 16 18 14"></polygon></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column (Span 3) -->
+      <div class="col-span-1 md:col-span-3 flex flex-col gap-6">
+        
+        <!-- Happy Clients Card -->
+        <div class="glass rounded-3xl p-8 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-500" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); --hover-color: #FF2E5B; --glow-color: rgba(255,46,91,0.1);">
+          <div class="mb-4 text-brand-rose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M12 16v6"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M2 12h6"/><path d="M16 12h6"/><path d="M4.93 19.07l4.24-4.24"/><path d="M14.83 9.17l4.24-4.24"/></svg></div>
+          <h3 class="font-inter font-bold text-white text-[19px] mb-2 leading-tight">200+ Happy Clients</h3>
+          <p class="text-[13px] text-gray-400">with 95% return rate</p>
+        </div>
+
+        <!-- Founder Profile Card -->
+        <div class="glass flex-1 rounded-3xl p-7 pb-0 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-500 min-h-[350px]" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); --hover-color: #A95034; --glow-color: rgba(169,80,52,0.15);">
+          <!-- Details Header -->
+          <div class="flex justify-between items-start mb-6 relative z-20">
+            <div>
+              <h3 class="font-inter font-bold text-white text-[17px] mb-1">Vinamra Agrawal</h3>
+              <p class="text-[13px] text-gray-400">Chief Creative Office</p>
+            </div>
+            <!-- LinkedIn Icon linked to profile -->
+            <a href="https://www.linkedin.com/in/thevinamra/" target="_blank" class="text-gray-500 hover:text-white transition-colors">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+          </div>
+          
+          <!-- Founder Portrait Canvas Container -->
+          <div class="absolute inset-x-0 bottom-0 top-[100px] flex justify-center items-end overflow-hidden z-0">
+            <!-- Founder Portrait Image -->
+            <img src="founder.png" alt="Vinamra Agrawal" class="relative z-10 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" style="filter: contrast(1.1) brightness(1.1);">
+          </div>
+        </div>
+
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  PARTNERS & CLIENTELE (Marquee Ticker)
+══════════════════════════════════════ -->
+<section id="partners" class="py-32 overflow-hidden" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="text-center mb-16 reveal max-w-[800px] mx-auto px-6">
+    <div style="font-size:11px; font-weight:800; letter-spacing:0.25em; color:#FF2E5B; text-transform:uppercase; margin-bottom:24px;">
+      Partners and Clientele
+    </div>
+    <h2 class="font-space font-bold leading-tight mb-6 text-white" style="font-size: clamp(32px, 4vw, 42px);">
+      We work with the best brands, small and<br>medium, out there
+    </h2>
+    <p class="mx-auto" style="font-size:16px; color:rgba(250,250,250,0.5); line-height:1.6; max-width: 600px;">
+      Our happy clients from over 10 countries stand as a testament to our commitment to delivering design that works.
+    </p>
+  </div>
+
+  <!-- Marquee Container (Fades on edges) -->
+  <div class="relative w-full flex flex-col gap-14 select-none pointer-events-none mt-20" 
+       style="mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);">
+    
+    <!-- Row 1 -->
+    <div class="animate-marquee">
+      <!-- Group 1 -->
+      <div class="flex items-center">
+        <div class="logo-item italic font-black text-3xl">TREND</div>
+        <div class="logo-item tracking-tighter lowercase">insta<span class="text-white/60">health</span></div>
+        <div class="logo-item font-inter tracking-tight">intel.</div>
+        <div class="logo-item flex items-center text-xl"><div class="w-6 h-6 border-2 border-white/40 rounded-full mr-2"></div>WHITEWATER SOLUTIONS</div>
+        <div class="logo-item font-black tracking-widest text-[#FFF]">PHILIPS</div>
+        <div class="logo-item">SPC | <span class="font-light">Free Zone</span></div>
+        <div class="logo-item font-inter font-black italic">AutoFinder.com</div>
+        <div class="logo-item uppercase tracking-tighter text-2xl">REPUBLIC OF OCEAN</div>
+      </div>
+      <!-- Group 1 Clone for seamless loop -->
+      <div class="flex items-center">
+        <div class="logo-item italic font-black text-3xl">TREND</div>
+        <div class="logo-item tracking-tighter lowercase">insta<span class="text-white/60">health</span></div>
+        <div class="logo-item font-inter tracking-tight">intel.</div>
+        <div class="logo-item flex items-center text-xl"><div class="w-6 h-6 border-2 border-white/40 rounded-full mr-2"></div>WHITEWATER SOLUTIONS</div>
+        <div class="logo-item font-black tracking-widest text-[#FFF]">PHILIPS</div>
+        <div class="logo-item">SPC | <span class="font-light">Free Zone</span></div>
+        <div class="logo-item font-inter font-black italic">AutoFinder.com</div>
+        <div class="logo-item uppercase tracking-tighter text-2xl">REPUBLIC OF OCEAN</div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="animate-marquee-reverse opacity-80" style="transform: translateX(-50%);">
+      <!-- Group 2 -->
+      <div class="flex items-center">
+        <div class="logo-item uppercase text-3xl">HZ</div>
+        <div class="logo-item font-inter font-black tracking-widest lowercase"><span class="italic font-bold mr-2 text-white/70">⚡</span> devtron</div>
+        <div class="logo-item font-black text-4xl" style="font-family: cursive;">ROZ</div>
+        <div class="logo-item flex items-center"><div class="px-3 py-1 border-2 border-white/40 rounded-full mr-2 text-xs">••</div> IBOT</div>
+        <div class="logo-item font-black tracking-tighter uppercase whitespace-normal leading-none" style="width: 120px;">SUPER<br>PRECISION.</div>
+        <div class="logo-item font-serif font-bold text-3xl">Flair.</div>
+        <div class="logo-item font-light text-3xl tracking-wide">Qeewee</div>
+        <div class="logo-item font-inter tabular-nums leading-none tracking-tighter" style="width: 60px;">open<br>door</div>
+        <div class="logo-item font-bold tracking-tight">Zeda.io</div>
+      </div>
+      <!-- Group 2 Clone -->
+      <div class="flex items-center">
+        <div class="logo-item uppercase text-3xl">HZ</div>
+        <div class="logo-item font-inter font-black tracking-widest lowercase"><span class="italic font-bold mr-2 text-white/70">⚡</span> devtron</div>
+        <div class="logo-item font-black text-4xl" style="font-family: cursive;">ROZ</div>
+        <div class="logo-item flex items-center"><div class="px-3 py-1 border-2 border-white/40 rounded-full mr-2 text-xs">••</div> IBOT</div>
+        <div class="logo-item font-black tracking-tighter uppercase whitespace-normal leading-none" style="width: 120px;">SUPER<br>PRECISION.</div>
+        <div class="logo-item font-serif font-bold text-3xl">Flair.</div>
+        <div class="logo-item font-light text-3xl tracking-wide">Qeewee</div>
+        <div class="logo-item font-inter tabular-nums leading-none tracking-tighter" style="width: 60px;">open<br>door</div>
+        <div class="logo-item font-bold tracking-tight">Zeda.io</div>
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="animate-marquee opacity-60">
+      <!-- Group 3 -->
+      <div class="flex items-center">
+        <div class="logo-item uppercase tracking-widest text-lg">FOUNDERSHIP</div>
+        <div class="logo-item uppercase font-light text-xl leading-none" style="width:120px;">siam<br><span class="font-bold">computing</span></div>
+        <div class="logo-item flex items-center"><div class="w-7 h-7 bg-white/40 rounded flex items-center justify-center text-black text-xs mr-2">S</div> Steer</div>
+        <div class="logo-item text-4xl lowercase tracking-tighter" style="font-family: cursive;">wishlink</div>
+        <div class="logo-item border border-white/40 px-3 py-1 font-bold text-xl uppercase tracking-tighter">TALENT 500</div>
+        <div class="logo-item font-black text-3xl">SciRio</div>
+        <div class="logo-item tracking-tighter text-3xl font-inter">CLICKIKON</div>
+        <div class="logo-item font-serif italic text-4xl">Yara</div>
+        <div class="logo-item uppercase text-xl leading-none" style="width: 120px;">Sahayak<br><span class="font-light tracking-wide">FORMS</span></div>
+      </div>
+      <!-- Group 3 Clone -->
+      <div class="flex items-center">
+        <div class="logo-item uppercase tracking-widest text-lg">FOUNDERSHIP</div>
+        <div class="logo-item uppercase font-light text-xl leading-none" style="width:120px;">siam<br><span class="font-bold">computing</span></div>
+        <div class="logo-item flex items-center"><div class="w-7 h-7 bg-white/40 rounded flex items-center justify-center text-black text-xs mr-2">S</div> Steer</div>
+        <div class="logo-item text-4xl lowercase tracking-tighter" style="font-family: cursive;">wishlink</div>
+        <div class="logo-item border border-white/40 px-3 py-1 font-bold text-xl uppercase tracking-tighter">TALENT 500</div>
+        <div class="logo-item font-black text-3xl">SciRio</div>
+        <div class="logo-item tracking-tighter text-3xl font-inter">CLICKIKON</div>
+        <div class="logo-item font-serif italic text-4xl">Yara</div>
+        <div class="logo-item uppercase text-xl leading-none" style="width: 120px;">Sahayak<br><span class="font-light tracking-wide">FORMS</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 3 — INDUSTRIES & SERVICES
+══════════════════════════════════════ -->
+<section id="industries" class="relative z-10 py-32 px-6 md:px-16" style="background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="text-center mb-16 reveal">
+      <div class="inline-flex items-center gap-4 mb-6" style="font-size:10px; font-weight:700; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase;">
+        <div style="width:40px; height:1px; background:rgba(255,255,255,0.15);"></div>
+        Field of Expertise
+        <div style="width:40px; height:1px; background:rgba(255,255,255,0.15);"></div>
+      </div>
+      <h2 class="font-space font-bold leading-none tracking-tight mb-4 text-white"
+        style="font-size: clamp(40px, 5.5vw, 72px);">
+        Universal <span class="text-grad-cyan italic">Impact.</span>
+      </h2>
+      <p style="font-size:16px; font-weight:300; color:rgba(250,250,250,0.4); max-width:500px; margin:0 auto;">
+        Worked across 10+ verticals. Select an industry to see how we've driven results.
+      </p>
+    </div>
+
+    <!-- Industry Selector -->
+    <div class="flex flex-wrap justify-center gap-3 mb-16 reveal delay-100">
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold active" onclick="selectIndustry(this)">💰 Fintech</button>
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold" onclick="selectIndustry(this)">🎓 Edtech</button>
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold" onclick="selectIndustry(this)">🏥 Healthtech</button>
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold" onclick="selectIndustry(this)">🏗️ Construction</button>
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold" onclick="selectIndustry(this)">☁️ B2B SaaS</button>
+      <button class="industry-tab px-7 py-3 rounded-full glass text-sm font-semibold" onclick="selectIndustry(this)">🤖 AI & ML</button>
+    </div>
+
+    <!-- Services Grid -->
+    <div id="services" class="grid grid-cols-1 md:grid-cols-3 gap-7 reveal delay-200">
+      <div class="glass glass-hover rounded-3xl p-10 tilt-card border-beam" style="box-shadow: 0 20px 60px rgba(0,0,0,0.4); --hover-color: #00F3FF; --glow-color: rgba(0, 243, 255, 0.2);">
+        <div class="rounded-2xl glass glass-cyan mb-8 flex items-center justify-center relative z-20" style="width:56px;height:56px;font-size:24px;">💎</div>
+        <h3 class="font-space font-bold text-white mb-3 relative z-20" style="font-size:22px;">UI/UX Product Design</h3>
+        <p class="leading-relaxed mb-8 relative z-20" style="font-size:14px; color:rgba(250,250,250,0.5);">High-fidelity product interfaces that balance technical complexity with flawless user intuition. Built natively in Figma.</p>
+        <span class="font-bold px-4 py-2 rounded-full relative z-20" style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#00F3FF; background:rgba(0,243,255,0.08); border:1px solid rgba(0,243,255,0.2);">Figma · High-Fidelity</span>
+      </div>
+      <div class="glass glass-hover rounded-3xl p-10 tilt-card glass-rose border-beam" style="box-shadow: 0 20px 60px rgba(0,0,0,0.4); --hover-color: #FF2E5B; --glow-color: rgba(255, 46, 91, 0.2);">
+        <div class="rounded-2xl glass glass-rose mb-8 flex items-center justify-center relative z-20" style="width:56px;height:56px;font-size:24px;">⚡</div>
+        <h3 class="font-space font-bold text-white mb-3 relative z-20" style="font-size:22px;">Webflow & Framer Dev</h3>
+        <p class="leading-relaxed mb-8 relative z-20" style="font-size:14px; color:rgba(250,250,250,0.5);">Pixel-perfect, fully responsive platforms developed natively—zero handoff rework, rapid time-to-market.</p>
+        <span class="font-bold px-4 py-2 rounded-full relative z-20" style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#FF2E5B; background:rgba(255,46,91,0.08); border:1px solid rgba(255,46,91,0.2);">Zero-Rework Code</span>
+      </div>
+      <div class="glass glass-hover rounded-3xl p-10 tilt-card border-beam" style="box-shadow: 0 20px 60px rgba(0,0,0,0.4); --hover-color: rgba(255,255,255,0.4); --glow-color: rgba(255,255,255,0.1);">
+        <div class="rounded-2xl glass mb-8 flex items-center justify-center relative z-20" style="width:56px;height:56px;font-size:24px;">🎭</div>
+        <h3 class="font-space font-bold text-white mb-3 relative z-20" style="font-size:22px;">Branding & Identity</h3>
+        <p class="leading-relaxed mb-8 relative z-20" style="font-size:14px; color:rgba(250,250,250,0.5);">Bold visual systems with deep character. Identities that make startups instantly recognizable and memorable.</p>
+        <span class="font-bold px-4 py-2 rounded-full relative z-20" style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.7); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);">Unique Character</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+  SECTION 4 — INTERACTIVE BENTO CONTACT
+══════════════════════════════════════ -->
+<section id="contact" class="py-24 px-6 md:px-16" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 reveal">
+      
+      <!-- Left Column: CTA & Socials -->
+      <div class="col-span-1 md:col-span-4 flex flex-col gap-6">
+        <!-- CTA Card -->
+        <div class="glass flex-1 rounded-[32px] p-10 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-700"
+             style="background: linear-gradient(160deg, rgba(255,46,91,0.2) 0%, rgba(9,9,11,0.9) 80%); border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5); min-height: 380px; --hover-color: #FF2E5B; --glow-color: rgba(255, 46, 91, 0.1);">
+          <div class="absolute inset-0 bg-brand-rose/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <h2 class="font-space font-bold text-white leading-[1.1] mb-8 relative z-10 transition-transform duration-500 group-hover:translate-x-1" style="font-size: clamp(32px, 2.5vw, 42px);">
+            Need a Hand?<br>We're Just a Click Away!
+          </h2>
+          <p class="text-[14px] text-gray-400 leading-relaxed absolute bottom-10 left-10 right-10 z-10">
+            Let us help you create designs that captivate and inspire.
+          </p>
+        </div>
+        <!-- Socials Row -->
+        <div class="grid grid-cols-3 gap-6 h-[80px]">
+          <a href="https://www.instagram.com/brandherodesign" target="_blank" class="glass rounded-[24px] h-full flex items-center justify-center text-[28px] text-white transition-all duration-500 hover:-translate-y-2 hover:bg-brand-rose/10 hover:text-brand-rose hover:border-brand-rose/40 hover:shadow-[0_15px_30px_rgba(255,46,91,0.2)]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://x.com/brandheroux" target="_blank" class="glass rounded-[24px] h-full flex items-center justify-center text-[28px] text-white transition-all duration-500 hover:-translate-y-2 hover:bg-white/5 hover:text-white hover:border-white/30 hover:shadow-[0_15px_30px_rgba(255,255,255,0.1)]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.004 4.076H5.036z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/company/brandherodesign/" target="_blank" class="glass rounded-[24px] h-full flex items-center justify-center text-[28px] text-white transition-all duration-500 hover:-translate-y-2 hover:bg-brand-cyan/10 hover:text-[#00F3FF] hover:border-brand-cyan/40 hover:shadow-[0_15px_30px_rgba(0,243,255,0.2)]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Center Column: Newsletter & Globe -->
+      <div class="col-span-1 md:col-span-4 flex flex-col gap-6">
+        <!-- Newsletter -->
+        <div class="glass rounded-[32px] p-8 flex flex-col justify-center border-beam hover:scale-[1.02] transition-all duration-700 tilt-card h-[160px]" style="border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: #00F3FF; --glow-color: rgba(0, 243, 255, 0.1);">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-brand-rose">🚀</span>
+            <span class="font-space font-bold text-[18px] text-white">Subscribe to our newsletter</span>
+          </div>
+          <div class="flex items-center rounded-xl overflow-hidden glass p-1 border-white/10">
+            <input type="email" placeholder="Your best email" class="bg-transparent border-none text-white px-4 py-2 w-full text-sm outline-none placeholder:text-gray-500" style="min-width: 0;">
+            <button class="whitespace-nowrap rounded-lg px-4 py-2 text-sm font-bold text-white transition-all hover:bg-white hover:text-black" style="background: rgba(255,255,255,0.1);">Sign me up</button>
+          </div>
+        </div>
+        
+        <!-- Animated 3D CSS Globe Card -->
+        <div class="glass flex-1 rounded-[32px] p-8 relative overflow-hidden group tilt-card border-beam hover:scale-[1.02] transition-all duration-700"
+             style="background: linear-gradient(200deg, rgba(255,46,91,0.15) 0%, rgba(9,9,11,0.95) 80%); border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5); min-height: 280px; --hover-color: #FF2E5B; --glow-color: rgba(255, 46, 91, 0.15);">
+          
+          <div class="absolute -bottom-[25px] -right-[25px] w-[260px] h-[260px] rounded-full overflow-hidden z-0" 
+               style="background: #000; box-shadow: inset -40px -40px 80px rgba(0,0,0,1), inset 0 0 50px rgba(255,46,91,0.15);">
+            <!-- High-speed scrolling dotted map -->
+            <div style="position:absolute; width:200%; height:100%; top:0; left:0; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 8px 8px; animation: slideGlobeText 25s linear infinite;"></div>
+            
+            <!-- Glowing Global Cities -->
+            <div class="absolute top-[35%] left-[25%] w-1.5 h-1.5 rounded-full bg-brand-rose pulse-red z-10" style="animation-delay: 0s;"></div>
+            <div class="absolute top-[50%] left-[20%] w-1.5 h-1.5 rounded-full bg-brand-rose pulse-red z-10" style="animation-delay: 0.5s;"></div>
+            <div class="absolute top-[45%] right-[25%] w-1.5 h-1.5 rounded-full bg-brand-rose pulse-red z-10" style="animation-delay: 1.2s;"></div>
+            <div class="absolute top-[60%] right-[30%] w-1.5 h-1.5 rounded-full bg-brand-rose pulse-red z-10" style="animation-delay: 0.8s;"></div>
+            <div class="absolute top-[25%] left-[45%] w-1.5 h-1.5 rounded-full bg-brand-rose pulse-red z-10" style="animation-delay: 0.2s;"></div>
+            
+            <!-- Pitch Black 3D Shadow Mask -->
+            <div class="absolute inset-0 rounded-full pointer-events-none z-20" style="box-shadow: inset -60px -60px 100px rgba(0,0,0,0.95);"></div>
+          </div>
+          
+          <h3 class="font-space font-bold text-white mb-3 relative z-10 transition-transform duration-500 group-hover:translate-x-1" style="font-size: clamp(24px, 2.5vw, 32px);">We serve around the Globe</h3>
+          <p class="text-[13px] text-gray-400 leading-relaxed max-w-[65%] relative z-10">
+            Connecting globally, working remotely—wherever you are, we're there!
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Stats -->
+      <div class="col-span-1 md:col-span-4 flex flex-col gap-6">
+        <div class="glass rounded-[32px] p-10 flex-1 tilt-card border-beam hover:scale-[1.02] transition-all duration-700 flex flex-col justify-center" style="border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: rgba(255,255,255,0.4); --glow-color: rgba(255,255,255,0.05);">
+          <div class="font-space text-[64px] leading-none font-black text-white mb-4">95%</div>
+          <p class="text-sm text-gray-400 leading-relaxed max-w-[200px]">of our clients choose to work with us again</p>
+        </div>
+        <div class="glass rounded-[32px] p-10 flex-1 tilt-card border-beam hover:scale-[1.02] transition-all duration-700 flex flex-col justify-center" style="border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01); box-shadow: 0 20px 50px rgba(0,0,0,0.5); --hover-color: rgba(255,255,255,0.4); --glow-color: rgba(255,255,255,0.05);">
+          <div class="font-space text-[64px] leading-none font-black text-white mb-4">40%</div>
+          <p class="text-[13px] text-gray-400 leading-[1.6] pr-4">Increase In Conversions. Better design, better conversions.</p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-16 px-6 md:px-16 text-center relative z-10" style="border-top: 1px solid rgba(255,255,255,0.04);">
+  <p style="font-size:11px; letter-spacing:0.4em; color:rgba(255,255,255,0.2); text-transform:uppercase;">BrandHero Studio © 2026 · Global Remote Design Studio</p>
+</footer>
+
+<script>
+/* ════════════════════════════════════════
+   CANVAS GLOBE — Particle / Dot Matrix
+════════════════════════════════════════ */
+(function initGlobe() {
+  const canvas = document.getElementById('globe-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+  resize();
+  window.addEventListener('resize', resize);
+
+  const RADIUS = Math.min(window.innerWidth, window.innerHeight) * 0.32;
+  const DOTS = 250;
+  const CONNECTIONS = 80;
+
+  let rotY = 0;
+  let rotX = 0.25;
+  let mouseX = 0, mouseY = 0;
+
+  // Generate points on sphere surface (Fibonacci lattice)
+  const points = [];
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < DOTS; i++) {
+    const y = 1 - (i / (DOTS - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const theta = phi * i;
+    points.push({
+      x: Math.cos(theta) * r,
+      y: y,
+      z: Math.sin(theta) * r,
+      pulse: Math.random() * Math.PI * 2,
+      size: Math.random() > 0.95 ? 3 : 1.5
+    });
+  }
+
+  // Track mouse for subtle interactivity
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.4;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.2;
+  });
+
+  let frame = 0;
+
+  function project(p3) {
+    const cosX = Math.cos(rotX + mouseY), sinX = Math.sin(rotX + mouseY);
+    const cosY = Math.cos(rotY + mouseX), sinY = Math.sin(rotY + mouseX);
+
+    let x = p3.x, y = p3.y, z = p3.z;
+    // Rotate Y (longitude spin)
+    const x1 = x * cosY - z * sinY;
+    const z1 = x * sinY + z * cosY;
+    // Rotate X (tilt)
+    const y1 = y * cosX - z1 * sinX;
+    const z2 = y * sinX + z1 * cosX;
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const fov = 3;
+    const scale = fov / (fov + z2 + 1);
+    return { px: cx + x1 * RADIUS * scale, py: cy + y1 * RADIUS * scale, z: z2, scale };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    rotY += 0.003;
+
+    const projected = points.map((p, i) => ({ ...project(p), p, i }));
+    projected.sort((a, b) => a.z - b.z);
+
+    // Draw connection lines (arcs between nearby nodes)
+    let conn = 0;
+    for (let i = 0; i < projected.length && conn < CONNECTIONS; i++) {
+      for (let j = i + 1; j < projected.length && conn < CONNECTIONS; j++) {
+        const a = projected[i], b = projected[j];
+        const dx = a.px - b.px, dy = a.py - b.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < RADIUS * 0.35) {
+          const avgZ = (a.z + b.z) / 2;
+          const alpha = ((avgZ + 1) / 2) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(a.px, a.py);
+          ctx.lineTo(b.px, b.py);
+          ctx.strokeStyle = `rgba(0, 243, 255, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+          conn++;
+        }
+      }
+    }
+
+    // Draw dots
+    projected.forEach(({ px, py, z, scale, p, i }) => {
+      const normZ = (z + 1) / 2;
+      const pulse = Math.sin(frame * 0.04 + p.pulse) * 0.5 + 0.5;
+      const alpha = normZ * 0.7 + 0.05;
+
+      // Special "node" points (clients / YC)
+      if (p.size > 2) {
+        // Outer glow ring
+        const grad = ctx.createRadialGradient(px, py, 0, px, py, 12 * scale + 4);
+        grad.addColorStop(0, `rgba(0, 243, 255, ${alpha * 0.6})`);
+        grad.addColorStop(0.4, `rgba(0, 243, 255, ${alpha * 0.3})`);
+        grad.addColorStop(1, 'rgba(0, 243, 255, 0)');
+        ctx.beginPath();
+        ctx.arc(px, py, 12 * scale + 4 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(px, py, p.size * scale, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 243, 255, ${alpha})`;
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(px, py, p.size * scale, 0, Math.PI * 2);
+        ctx.fillStyle = normZ > 0.6
+          ? `rgba(0, 243, 255, ${alpha * 0.85})`
+          : `rgba(255, 255, 255, ${alpha * 0.3})`;
+        ctx.fill();
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+
+/* ════════════════════════════════════════
+   PRELOADER EXIT + PAGE REVEAL
+════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  const preloader = document.getElementById('preloader');
+  const nav = document.getElementById('header-nav');
+
+  // Logo animation runs 5.5s — then we trigger exit
+  setTimeout(() => {
+    preloader.style.opacity = '0';
+    document.body.classList.remove('no-scroll');
+
+    setTimeout(() => {
+      preloader.remove();
+      nav.style.transform = 'translateY(0)';
+      nav.style.opacity = '1';
+      document.querySelectorAll('#hero .reveal').forEach(el => el.classList.add('visible'));
+
+      // Trigger progress bars after hero appears
+      setTimeout(() => {
+        document.querySelectorAll('.progress-fill').forEach((bar, i) => {
+          const w = bar.dataset.w;
+          if (w) setTimeout(() => { bar.style.width = w + '%'; }, i * 300);
+        });
+      }, 600);
+    }, 1200);
+  }, 5600);
+});
+
+/* ════════════════════════════════════════
+   GLOBAL MOUSE SPOTLIGHT & TILT
+════════════════════════════════════════ */
+document.addEventListener('mousemove', e => {
+  // Global Spotlight
+  document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+  document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+});
+
+document.querySelectorAll('.tilt-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    
+    // Set Local Card Variables for CSS Glow
+    card.style.setProperty('--card-x', `${x}px`);
+    card.style.setProperty('--card-y', `${y}px`);
+    
+    // 3D Tilt Logic
+    const centerX = r.width / 2;
+    const centerY = r.height / 2;
+    const rotateY = ((x - centerX) / centerX) * 12; // Max 12 deg
+    const rotateX = ((y - centerY) / centerY) * -12;
+    
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+
+    // Dynamic Glow Color (shorter distance to center = more cyan, further = more rose)
+    const distToCenter = Math.sqrt((x - centerX)**2 + (y - centerY)**2);
+    const maxDist = Math.sqrt(centerX**2 + centerY**2);
+    const ratio = distToCenter / maxDist;
+    const glowColor = ratio > 0.5 ? 'rgba(255,46,91,0.2)' : 'rgba(0,243,255,0.2)';
+    card.style.setProperty('--glow-color', glowColor);
+  });
+  
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+  });
+});
+
+/* ════════════════════════════════════════
+   ADVANCED ZOOM REVEAL (INTERSECTION)
+════════════════════════════════════════ */
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      entry.target.classList.remove('scrolling-out');
+    } else {
+      // Add a subtle "zoom out" when it leaves the top of the viewport
+      if (entry.boundingClientRect.top < 0) {
+        entry.target.classList.add('scrolling-out');
+      }
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => scrollObserver.observe(el));
+
+/* ════════════════════════════════════════
+   INDUSTRY SELECTOR
+════════════════════════════════════════ */
+function selectIndustry(btn) {
+  document.querySelectorAll('.industry-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ════════════════════════════════════════
+   YOUTUBE IFRAME API (Guaranteed Autoplay)
+════════════════════════════════════════ */
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var showcasePlayer;
+function onYouTubeIframeAPIReady() {
+  showcasePlayer = new YT.Player('yt-showcase-player', {
+    videoId: 'gzoHbWkcd9E', // Target video ID
+    playerVars: {
+      'autoplay': 1,
+      'controls': 0,
+      'mute': 1,
+      'playsinline': 1,
+      'loop': 1,
+      'playlist': 'gzoHbWkcd9E',
+      'modestbranding': 1,
+      'rel': 0,
+      'showinfo': 0,
+      'disablekb': 1
+    },
+    events: {
+      'onReady': function(event) {
+        event.target.mute(); // Force mute to bypass browser blocks
+        event.target.playVideo(); // Programmatically start playback
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════
+   WIDGET DRAG LOGIC (DOUBLE CLICK)
+════════════════════════════════════════ */
+const widget = document.getElementById('data-lab-widget');
+if (widget) {
+  let isDragMode = false;
+  let startX = 0, startY = 0, currentX = 0, currentY = 0;
+
+  widget.addEventListener('dblclick', () => {
+    isDragMode = !isDragMode;
+    if (isDragMode) {
+      widget.style.cursor = 'grab';
+      widget.style.border = '2px dashed #00F3FF';
+      if (!widget.style.left) widget.style.left = '0px';
+      if (!widget.style.top) widget.style.top = '0px';
+    } else {
+      widget.style.cursor = 'default';
+      widget.style.border = '1px solid rgba(255,255,255,0.07)';
+    }
+  });
+
+  widget.addEventListener('mousedown', (e) => {
+    if (!isDragMode) return;
+    e.preventDefault();
+    widget.style.cursor = 'grabbing';
+    
+    startX = e.clientX - parseInt(widget.style.left || '0');
+    startY = e.clientY - parseInt(widget.style.top || '0');
+    
+    function onMouseMove(e) {
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      widget.style.left = currentX + 'px';
+      widget.style.top = currentY + 'px';
+    }
+    
+    function onMouseUp() {
+      widget.style.cursor = 'grab';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+}
+</script>
+</body>
+</html>
